@@ -1,0 +1,6 @@
+{
+  "name": "PriceLens",
+  "description": "AI-powered e-commerce price comparison & visual product search web application.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

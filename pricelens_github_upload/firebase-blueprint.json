@@ -1,0 +1,52 @@
+{
+  "entities": {
+    "users": {
+      "title": "Users",
+      "description": "User profiles and account settings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "avatar": { "type": "string" },
+        "joinedDate": { "type": "string" },
+        "preferences": { "type": "object" }
+      },
+      "required": ["id", "name", "email"]
+    },
+    "users/{userId}/wishlist": {
+      "title": "Wishlist",
+      "description": "User saved products",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "productName": { "type": "string" },
+        "category": { "type": "string" },
+        "addedAt": { "type": "string" }
+      },
+      "required": ["id", "productName"]
+    },
+    "users/{userId}/searchHistory": {
+      "title": "Search History",
+      "description": "User price comparison history",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "productName": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "productName"]
+    },
+    "users/{userId}/priceAlerts": {
+      "title": "Price Alerts",
+      "description": "User active price drop alerts",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "productName": { "type": "string" },
+        "targetPrice": { "type": "number" }
+      },
+      "required": ["id", "productName"]
+    }
+  }
+}

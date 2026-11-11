@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/* Brand CSS Variables */
+:root {
+  --purple: #a855f7;
+  --fuchsia: #d946ef;
+  --violet: #7c3aed;
+  --cyan: #06b6d4;
+  --bg-deep: #0d0d1a;
+}
+
+/* Keep horizontal category carousels scrollable without showing a scrollbar. */
+.hide-scrollbar { scrollbar-width: none; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+
+.pricelens-dark-theme {
+  color: #f1f5f9;
+}
+.pricelens-dark-theme .bg-white { background-color: #111827 !important; }
+.pricelens-dark-theme .bg-slate-50,
+.pricelens-dark-theme .bg-\[\#fbfbfd\] { background-color: #080d1a !important; }
+.pricelens-dark-theme .border-slate-100,
+.pricelens-dark-theme .border-slate-200 { border-color: rgba(148,163,184,0.18) !important; }
+.pricelens-dark-theme .text-slate-900 { color: #f8fafc !important; }
+.pricelens-dark-theme .text-slate-800 { color: #e2e8f0 !important; }
+.pricelens-dark-theme .text-slate-700 { color: #cbd5e1 !important; }
+.pricelens-dark-theme [class*="text-orange-"] { color: #67e8f9 !important; }
+.pricelens-dark-theme [class~="bg-orange-500"] { background-color: #06b6d4 !important; }
+.pricelens-dark-theme [class~="bg-orange-600"] { background-color: #0891b2 !important; }
+.pricelens-dark-theme [class~="bg-orange-400"] { background-color: #7c3aed !important; }
+.pricelens-dark-theme [class~="bg-orange-50"],
+.pricelens-dark-theme [class~="bg-orange-50/60"] { background-color: rgba(6,182,212,0.08) !important; }
+.pricelens-dark-theme [class~="bg-orange-950/50"] { background-color: rgba(15,23,42,0.75) !important; }
+.pricelens-dark-theme [class*="border-orange-"]:not([class*="hover:border-orange-"]) { border-color: rgba(6,182,212,0.35) !important; }
+.pricelens-dark-theme [class*="ring-orange-"] { --tw-ring-color: rgba(6,182,212,0.35) !important; }
+.pricelens-dark-theme [class*="accent-orange-"] { accent-color: #06b6d4; }
+.pricelens-dark-theme [class*="from-orange-"] { --tw-gradient-from: #7c3aed var(--tw-gradient-from-position); --tw-gradient-to: rgb(124 58 237 / 0) var(--tw-gradient-to-position); }
+.pricelens-dark-theme [class*="to-amber-"] { --tw-gradient-to: #06b6d4 var(--tw-gradient-to-position); }
+.pricelens-dark-theme [class*="shadow-orange-"] { --tw-shadow-color: rgba(6,182,212,0.2); }
+.pricelens-dark-theme [class*="hover:bg-orange-"]:hover { background-color: rgba(6,182,212,0.2) !important; }
+.pricelens-dark-theme [class*="hover:border-orange-"]:hover { border-color: rgba(6,182,212,0.45) !important; }
+.pricelens-dark-theme [class*="focus:border-orange-"]:focus { border-color: #06b6d4 !important; }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0d0d1a; }
+::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.4); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(168,85,247,0.7); }
+
+/* Scanning beam */
+@keyframes scan {
+  0%, 100% { top: 0%; }
+  50% { top: 100%; }
+}
+
+/* Loading bar */
+@keyframes progress {
+  0% { width: 0%; }
+  60% { width: 75%; }
+  100% { width: 100%; }
+}
+
+/* Animated gradient border shift */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Subtle float */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Pulse glow */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.85; }
+}
+
+/* Shimmer sweep */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Slide in from bottom */
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Bounce subtle */
+@keyframes bounceSoft {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+/* Typewriter cursor blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Spinning ring */
+@keyframes spinRing {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Particle float */
+@keyframes particleFloat {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-20px) scale(1); opacity: 0; }
+}
