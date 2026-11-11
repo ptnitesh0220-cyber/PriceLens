@@ -207,6 +207,99 @@ function generateRealisticOffers(productName: string, category: string) {
   };
 }
 
+
+// ----------------------------------------------------
+// LIVE PRICES (Google Shopping via SerpApi). Needs SERPAPI_KEY env var.
+// Falls back to the estimated offers below when the key is missing or the call fails.
+// ----------------------------------------------------
+const liveCache = new Map<string, { at: number; data: any }>();
+const LIVE_CACHE_MS = 10 * 60 * 1000;
+
+function cleanStoreName(source: string): string {
+  const s = (source || "Online Store").replace(/\.(in|com|co\.in)$/i, "").trim();
+  if (/^amazon/i.test(s)) return "Amazon";
+  if (/^flipkart/i.test(s)) return "Flipkart";
+  if (/^myntra/i.test(s)) return "Myntra";
+  if (/^ajio/i.test(s)) return "Ajio";
+  if (/^croma/i.test(s)) return "Croma";
+  if (/^tata\s?cliq/i.test(s)) return "Tata CLIQ";
+  if (/^meesho/i.test(s)) return "Meesho";
+  return s || "Online Store";
+}
+
+function mapShoppingResults(results: any[]) {
+  const cheapestPerStore = new Map<string, any>();
+  for (const item of results || []) {
+    const price = Number(item?.extracted_price);
+    const link = item?.product_link || item?.link;
+    if (!price || price <= 0 || !link) continue;
+    const store = cleanStoreName(item.source);
+    const prev = cheapestPerStore.get(store);
+    if (!prev || price < prev.price) {
+      const oldPrice = Number(item.extracted_old_price) || 0;
+      const originalPrice = oldPrice > price ? oldPrice : price;
+      cheapestPerStore.set(store, {
+        id: `offer-${store.toLowerCase().replace(/\W+/g, "-")}-${Date.now()}`,
+        platform: store,
+        platformLogo: store.toLowerCase().replace(/\W+/g, ""),
+        title: item.title || store,
+        price,
+        originalPrice,
+        discountPct: originalPrice > price ? Math.round((1 - price / originalPrice) * 100) : 0,
+        rating: Number(item.rating) || 0,
+        reviewCount: Number(item.reviews) || 0,
+        deliveryInfo: item.delivery || "Check store for delivery details",
+        productUrl: link,
+        imageUrl: item.thumbnail || undefined,
+        isBestPrice: false,
+        stockStatus: "Available",
+      });
+    }
+  }
+  const offers = Array.from(cheapestPerStore.values()).sort((a, b) => a.price - b.price).slice(0, 10);
+  if (offers.length === 0) return null;
+  offers[0].isBestPrice = true;
+  const min = offers[0].price;
+  const max = offers[offers.length - 1].price;
+  const avg = Math.round(offers.reduce((sum, o) => sum + o.price, 0) / offers.length);
+  const highestOriginal = Math.max(...offers.map((o) => o.originalPrice || o.price));
+  return {
+    offers,
+    priceRange: { min, max, avg },
+    totalSavings: Math.max(0, highestOriginal - min),
+    imageUri: offers.find((o) => o.imageUrl)?.imageUrl || null,
+  };
+}
+
+async function fetchLiveOffers(productName: string) {
+  const key = process.env.SERPAPI_KEY;
+  if (!key || !key.trim()) return null;
+  const cacheKey = productName.toLowerCase().trim();
+  const cached = liveCache.get(cacheKey);
+  if (cached && Date.now() - cached.at < LIVE_CACHE_MS) return cached.data;
+  try {
+    const url = new URL(process.env.SERPAPI_BASE_URL || "https://serpapi.com/search.json");
+    url.searchParams.set("engine", "google_shopping");
+    url.searchParams.set("q", productName);
+    url.searchParams.set("gl", "in");
+    url.searchParams.set("hl", "en");
+    url.searchParams.set("google_domain", "google.co.in");
+    url.searchParams.set("api_key", key.trim());
+    const resp = await fetch(url, { signal: AbortSignal.timeout(20000) });
+    if (!resp.ok) {
+      console.error("SerpApi error status:", resp.status);
+      return null;
+    }
+    const json: any = await resp.json();
+    const mapped = mapShoppingResults(json.shopping_results || []);
+    if (mapped) liveCache.set(cacheKey, { at: Date.now(), data: mapped });
+    return mapped;
+  } catch (e) {
+    console.error("SerpApi request failed:", e);
+    return null;
+  }
+}
+
 // ----------------------------------------------------
 // API ROUTES
 // ----------------------------------------------------
@@ -221,7 +314,7 @@ app.post("/api/analyze-product", async (req, res) => {
     }
 
     // First check if query matches real online product database catalog
-    if (query) {
+    if (query && !process.env.SERPAPI_KEY) {
       const catalogMatch = dbManager.findCatalogProductByQuery(query);
       if (catalogMatch) {
         const sortedOffers = [...catalogMatch.offers].sort((a, b) => a.price - b.price);
@@ -329,8 +422,12 @@ Respond in JSON with the following structure:
       }
     }
 
-    // Generate comparison offers across real online store structures
-    const { offers, priceRange, totalSavings } = generateRealisticOffers(detectedProductName, category);
+    // Try live prices first; fall back to estimated offers
+    const live = await fetchLiveOffers(detectedProductName);
+    const { offers, priceRange, totalSavings } = live
+      ? live
+      : generateRealisticOffers(detectedProductName, category);
+    const priceSource = live ? "live" : "estimated";
     const queryId = `search-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     res.json({
@@ -339,7 +436,8 @@ Respond in JSON with the following structure:
       detectedBrand,
       category,
       confidenceScore,
-      imageUri: image || null,
+      imageUri: image || (live ? live.imageUri : null),
+      priceSource,
       keyFeatures,
       offers,
       priceRange,
