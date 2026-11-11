@@ -25,6 +25,7 @@ export interface ProductOffer {
   reviewCount: number;
   deliveryInfo: string;
   productUrl: string;
+  imageUrl?: string;
   isBestPrice: boolean;
   stockStatus: string;
 }
@@ -36,6 +37,7 @@ export interface AnalysisResult {
   category: string;
   confidenceScore: number;
   imageUri: string | null;
+  priceSource?: "live" | "estimated";
   keyFeatures: string[];
   offers: ProductOffer[];
   priceRange: {
