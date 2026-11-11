@@ -136,7 +136,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Image */}
       <div className="relative aspect-video bg-slate-950/80 flex items-center justify-center p-4 overflow-hidden">
         <img
-          src={productImage || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80"}
+          src={offer.imageUrl || productImage || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80"}
           alt={offer.title}
           onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80"; }}
           className="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-lg"

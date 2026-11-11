@@ -26,7 +26,6 @@ interface ProductResultsViewProps {
   onOpenCamera?: () => void;
 }
 
-const PLATFORMS = ["All", "Amazon", "Flipkart", "Myntra", "Croma", "Ajio"];
 const PLATFORM_COLORS: Record<string, string> = {
   All: "#a855f7",
   Amazon: "#FF9900",
@@ -306,7 +305,7 @@ export const ProductResultsView: React.FC<ProductResultsViewProps> = ({
             {/* Platform pills */}
             <div className="flex items-center gap-2 flex-wrap">
               <SlidersHorizontal className="w-4 h-4 shrink-0" style={{ color: "#64748b" }} />
-              {PLATFORMS.map((p) => {
+              {(["All", ...Array.from(new Set((analysisResult?.offers || []).map((o) => o.platform)))] as string[]).map((p) => {
                 const isActive = platformFilter === p;
                 const color = PLATFORM_COLORS[p] || "#a855f7";
                 return (
